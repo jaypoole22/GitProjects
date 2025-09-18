@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spending Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            width: 45%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .top-items {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .chart-section {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>👋 Hi, this is how you've been spending your money!</h2>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card" id="budgetDisplay"></div>
+            <div class="stat-card">📊 Projected Monthly Cost: <span id="projectedCost"></span></div>
+        </div>
+
+        <div class="top-items">
+            <h3>💰 Top 5 Items with Highest Spending</h3>
+            <ul id="topItemsList"></ul>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-section">
+                <h3>📈 Spending Over Time</h3>
+                <canvas id="spendingChart"></canvas>
+            </div>
+            <div class="chart-section">
+                <h3>📊 Monthly Spending Breakdown</h3>
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const lambdaUrl = "https://eqdp4j5d3bfcxhomaji7bljpda0vbcqf.lambda-url.us-east-1.on.aws/";
+
+        async function fetchSpendingData() {
+            try {
+                const response = await fetch(lambdaUrl);
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                return null;
+            }
+        }
+
+        async function renderCharts() {
+            const data = await fetchSpendingData();
+            if (!data) return;
+
+            const spendingEntries = Object.entries(data.spending_data || {}).sort((a, b) => new Date(a[0]) - new Date(b[0]));
+            const spendingLabels = spendingEntries.map(([date]) => new Date(date).toLocaleDateString());
+            const spendingValues = spendingEntries.map(([, amount]) => amount);
+
+            new Chart(document.getElementById('spendingChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: spendingLabels,
+                    datasets: [{
+                        label: 'Daily Spending',
+                        data: spendingValues,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false,
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            const monthlyEntries = Object.entries(data.monthly_spending || {});
+            const monthlyLabels = monthlyEntries.map(([month]) => month);
+            const monthlyValues = monthlyEntries.map(([, amount]) => amount);
+
+            new Chart(document.getElementById('monthlyChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: 'Monthly Spending',
+                        data: monthlyValues,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            const topItemsList = document.getElementById("topItemsList");
+            topItemsList.innerHTML = "";
+            (data.top_5_items || []).forEach(({ item, amount }) => {
+                const li = document.createElement("li");
+                li.textContent = `${item}: $${amount.toFixed(2)}`;
+                topItemsList.appendChild(li);
+            });
+
+            const budgetDisplay = document.getElementById("budgetDisplay");
+            budgetDisplay.textContent = `💵 Budget: $${data.budget}`;
+            budgetDisplay.style.color = data.projected_cost > data.budget ? "red" : "green";
+            document.getElementById("projectedCost").textContent = `$${data.projected_cost.toFixed(2)}`;
+        }
+
+        renderCharts();
+    </script>
+</body>
+</html>
