@@ -1,1 +1,1 @@
-This project showcases my first cloud personal project using AWS.
+This project showcases my first cloud personal project using AWS. The main focus of this project was on understanding as many AWS services as I could to create a financial tracking application. Therefore, the majority of the frontend coding wasn't created by me, but it gave me a foundation to use for learning how to implement cloud services.
