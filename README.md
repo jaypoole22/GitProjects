@@ -1,1 +1,2 @@
-This project showcases my first personal cloud project using AWS. The primary focus of this project was to understand as many AWS services as possible to create a financial tracking application. Therefore, the majority of the frontend coding wasn't designed by me, but it made a foundation for learning how to implement cloud services.
+This project showcases a personal cloud project using AWS. The primary focus of this project was to understand as many AWS services as possible to create a financial tracking application. The majority of the frontend coding was from a template, allowing the implementation of cloud services to be the primary focus.
+The services used within this project include Lambda, API Gateway, AWS Amplify, CloudWatch, DynamoDB, and IAM.
