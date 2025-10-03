@@ -1,5 +1,5 @@
 # Financial Tracker Project (AWS🚀)
- This project showcases a personal cloud project I did using AWS. The primary focus of this project was to include as many AWS services as possible to create a financial tracking application. I used a CI/CD pipeline on the frontend of the application. The majority of the frontend coding for this project was based on a template, allowing the implementation of cloud services to remain the main focus.
+ This project showcases a personal cloud project I did using AWS. The primary focus of this project was to implement as many AWS services as possible to create a financial tracking application. I used a CI/CD pipeline on the frontend of the application. The majority of the frontend coding for this project was based on a template, allowing the implementation of cloud services to remain the main focus.
 ## Services💻
 - AWS Amplify (CI/CD Deployment)
 - API Gateway (Routing & integration)        
